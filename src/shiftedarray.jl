@@ -18,7 +18,7 @@ The recommended constructor is `ShiftedArray(parent, shifts; default = missing)`
 julia> v = [1, 3, 5, 4];
 
 julia> s = ShiftedArray(v, (1,))
-4-element ShiftedArrays.ShiftedArray{Int64,Missing,1,Array{Int64,1}}:
+4-element ShiftedArray{Int64,Missing,1,Array{Int64,1}}:
   missing
  1
  3
@@ -27,14 +27,14 @@ julia> s = ShiftedArray(v, (1,))
 julia> v = [1, 3, 5, 4];
 
 julia> s = ShiftedArray(v, (1,))
-4-element ShiftedArrays.ShiftedArray{Int64,Missing,1,Array{Int64,1}}:
+4-element ShiftedArray{Int64,Missing,1,Array{Int64,1}}:
   missing
  1
  3
  5
 
 julia> copy(s)
-4-element Array{Union{Int64, Missing},1}:
+4-element Array{Union{Missing, Int64},1}:
   missing
  1
  3
@@ -43,7 +43,7 @@ julia> copy(s)
 julia> v = reshape(1:16, 4, 4);
 
 julia> s = ShiftedArray(v, (0, 2))
-4×4 ShiftedArrays.ShiftedArray{Int64,Missing,2,Base.ReshapedArray{Int64,2,UnitRange{Int64},Tuple{}}}:
+4×4 ShiftedArray{Int64,Missing,2,Base.ReshapedArray{Int64,2,UnitRange{Int64},Tuple{}}}:
  missing  missing  1  5
  missing  missing  2  6
  missing  missing  3  7
@@ -73,8 +73,11 @@ ShiftedVector(v::AbstractVector, n = (0,); default = missing) = ShiftedArray(v, 
 
 size(s::ShiftedArray) = size(parent(s))
 
+# Computing a shifted index (subtracting the offset)
+offset(offsets::NTuple{N,Int}, inds::NTuple{N,Int}) where {N} = map(-, inds, offsets)
+
 @inline function getindex(s::ShiftedArray{<:Any, <:Any, N}, x::Vararg{Int, N}) where {N}
-    i = OffsetArrays.offset(shifts(s), x)
+    i = offset(shifts(s), x)
     v = parent(s)
     if checkbounds(Bool, v, i...)
         @inbounds ret = v[i...]

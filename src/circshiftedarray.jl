@@ -11,7 +11,7 @@ Use `copy` to collect the values of a `CircShiftedArray` into a normal `Array`.
 julia> v = [1, 3, 5, 4];
 
 julia> s = CircShiftedArray(v, (1,))
-4-element ShiftedArrays.CircShiftedArray{Int64,1,Array{Int64,1}}:
+4-element CircShiftedArray{Int64,1,Array{Int64,1}}:
  4
  1
  3
@@ -64,7 +64,7 @@ end
 
 @inline function getindex(s::CircShiftedArray{T, N}, x::Vararg{Int, N}) where {T, N}
     v = parent(s)
-    ind = OffsetArrays.offset(shifts(s), x)
+    ind = offset(shifts(s), x)
     if checkbounds(Bool, v, ind...)
         @inbounds ret = v[ind...]
     else
@@ -76,7 +76,7 @@ end
 
 @inline function setindex!(s::CircShiftedArray{T, N}, el, x::Vararg{Int, N}) where {T, N}
     v = parent(s)
-    ind = OffsetArrays.offset(shifts(s), x)
+    ind = offset(shifts(s), x)
     if checkbounds(Bool, v, ind...)
         @inbounds v[ind...] = el
     else
